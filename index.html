@@ -1,1 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MBTI Field Trainer</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    :root {
+      --bg:#0b0f14; --card:#121a24; --border:#223043;
+      --text:#e8f0fb; --muted:#8aa0b6; --accent:#5bbcff;
+    }
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);}
+    header{position:sticky;top:0;background:rgba(11,15,20,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:14px 16px;}
+    h1{margin:0;font-size:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;}
+    main{padding:16px;max-width:900px;margin:0 auto;}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:12px;}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;}
+    .muted{color:var(--muted);}
+    .big{font-size:20px;font-weight:800;}
+    button{
+      width:100%;text-align:left;
+      border:1px solid var(--border);background:#0f1620;color:var(--text);
+      padding:12px 14px;border-radius:12px;font-weight:700;cursor:pointer;
+    }
+    button:hover{border-color:#2c3f57;}
+    .pill{font-size:12px;color:var(--muted);border:1px solid var(--border);padding:4px 10px;border-radius:999px;}
+    ul{margin:8px 0 0 18px;}
+    .row{display:flex;gap:10px;flex-wrap:wrap;}
+    .row button{width:auto;}
+    .divider{height:1px;background:var(--border);margin:12px 0;}
+    .accent{color:var(--accent);}
+  </style>
+</head>
+<body>
+<header>
+  <h1>
+    <span>MBTI Field Trainer</span>
+    <span class="pill" id="status">Loading…</span>
+  </h1>
+</header>
+
+<main>
+  <div class="grid" id="typeGrid"></div>
+  <div class="card" id="detailCard" style="display:none;"></div>
+</main>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  }
+
+  const statusEl = document.getElementById("status");
+  const gridEl = document.getElementById("typeGrid");
+  const detailEl = document.getElementById("detailCard");
+
+  let LIB = null;
+
+  function setStatus(txt){ statusEl.textContent = txt; }
+
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function renderGrid(types){
+    gridEl.innerHTML = `
+      <button onclick="randomType()">🎲 Random Type</button>
+      <button onclick="hideDetail()">📚 Hide Card</button>
+    ` + types.map(t => `
+      <button onclick="showType('${t.type}')">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;">
+          <div>
+            <div style="font-weight:900;font-size:16px;">${t.type}</div>
+            <div class="muted" style="font-size:12px;">${escapeHtml(t.callSign)}</div>
+          </div>
+          <div class="pill">${escapeHtml(t.essence)}</div>
+        </div>
+      </button>
+    `).join("");
+  }
+
+  function showType(code){
+    const t = LIB.types.find(x => x.type === code);
+    if(!t) return;
+
+    detailEl.style.display = "block";
+    detailEl.innerHTML = `
+      <div class="row" style="justify-content:space-between;align-items:center;">
+        <div>
+          <div class="big">${t.type} <span class="muted">•</span> <span class="accent">${escapeHtml(t.callSign)}</span></div>
+          <div class="muted">${escapeHtml(t.essence)}</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="muted">Observable tells</div>
+      <ul>${t.observableTells.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>
+
+      <div class="divider"></div>
+
+      <div class="muted">Earns trust</div>
+      <ul>${t.trustSignals.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>
+
+      <div class="divider"></div>
+
+      <div class="muted">Annoys them</div>
+      <ul>${t.annoysThem.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>
+
+      <div class="divider"></div>
+
+      <div class="muted">Pitch style</div>
+      <div>${escapeHtml(t.pitchStyle)}</div>
+
+      <div class="divider"></div>
+
+      <div class="muted">Verify questions</div>
+      <ul>${t.verifyQuestions.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>
+
+      <div class="divider"></div>
+
+      <div class="muted">Mistype traps</div>
+      <div>${t.mistypeTraps.map(x=>`<span class="pill" style="margin-right:6px;">${escapeHtml(x)}</span>`).join("")}</div>
+
+      <div class="divider"></div>
+
+      <div class="muted">Stress notes</div>
+      <div>${escapeHtml(t.stressNotes)}</div>
+    `;
+    detailEl.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+
+  function hideDetail(){
+    detailEl.style.display = "none";
+    detailEl.innerHTML = "";
+  }
+
+  function randomType(){
+    const idx = Math.floor(Math.random() * LIB.types.length);
+    showType(LIB.types[idx].type);
+  }
+
+  async function init(){
+    try{
+      const res = await fetch("./types.json", {cache:"no-store"});
+      LIB = await res.json();
+      renderGrid(LIB.types);
+      setStatus("Ready ✅");
+    } catch(e){
+      setStatus("Load failed");
+      gridEl.innerHTML = `<div class="card">Could not load types.json. Make sure it is in the same folder as index.html.</div>`;
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
 
