@@ -1,5 +1,3 @@
-
-
 <!doctype html>
 <html lang="en">
 <head>
@@ -11,57 +9,39 @@
     :root {
       --bg:#0b0f14; --card:#121a24; --border:#223043;
       --text:#e8f0fb; --muted:#8aa0b6; --accent:#5bbcff;
-      --good:#55d48a; --bad:#ff6b6b;
+      --good:#29d17d; --bad:#ff5b5b;
     }
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);}
-    header{position:sticky;top:0;background:rgba(11,15,20,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:14px 16px;z-index:10;}
+    header{position:sticky;top:0;background:rgba(11,15,20,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:14px 16px;}
     h1{margin:0;font-size:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;}
     main{padding:16px;max-width:900px;margin:0 auto;}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:12px;}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:12px;}
     .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;}
     .muted{color:var(--muted);}
     .big{font-size:20px;font-weight:800;}
-    .pill{font-size:12px;color:var(--muted);border:1px solid var(--border);padding:4px 10px;border-radius:999px;white-space:nowrap;}
-    .divider{height:1px;background:var(--border);margin:12px 0;}
-    .accent{color:var(--accent);}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
-    .row button{width:auto;}
-
     button{
-      width:100%;
-      text-align:left;
-      border:1px solid var(--border);
-      background:#0f1620;
-      color:var(--text);
-      padding:12px 14px;
-      border-radius:12px;
-      font-weight:700;
-      cursor:pointer;
+      width:100%;text-align:left;
+      border:1px solid var(--border);background:#0f1620;color:var(--text);
+      padding:12px 14px;border-radius:12px;font-weight:700;cursor:pointer;
     }
     button:hover{border-color:#2c3f57;}
-    button:disabled{opacity:0.6;cursor:not-allowed;}
-
+    .pill{font-size:12px;color:var(--muted);border:1px solid var(--border);padding:4px 10px;border-radius:999px;}
     ul{margin:8px 0 0 18px;}
-
-    .good{color:var(--good);}
-    .bad{color:var(--bad);}
-
-    .modeBtn{
-      width:auto;
-      text-align:center;
-      padding:10px 12px;
-      border-radius:999px;
-      font-weight:800;
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+    .row button{width:auto;}
+    .divider{height:1px;background:var(--border);margin:12px 0;}
+    .accent{color:var(--accent);}
+    .topControls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+    .topControls > *{flex:1;}
+    select{
+      width:100%;
+      border:1px solid var(--border);
+      background:#0f1620;color:var(--text);
+      padding:12px 14px;border-radius:12px;font-weight:700;
     }
-    .modeBtn.active{
-      border-color:#2c3f57;
-      background:#122033;
-    }
-
-    .mini{
-      font-size:12px;
-      line-height:1.25;
-    }
+    .resultGood{color:var(--good);font-weight:800;}
+    .resultBad{color:var(--bad);font-weight:800;}
+    .small{font-size:12px;}
   </style>
 </head>
 <body>
@@ -73,74 +53,17 @@
 </header>
 
 <main>
-  <!-- Top controls -->
-  <div class="card" id="topControls" style="margin-bottom:12px;">
-    <div class="row" style="justify-content:space-between;">
-      <div class="row" style="gap:8px;">
-        <button class="modeBtn active" id="btnStudy" onclick="setMode('study')">📚 Study</button>
-        <button class="modeBtn" id="btnDrill" onclick="setMode('drill')">🎯 Drill</button>
-      </div>
-
-      <div class="row" style="gap:8px;">
-        <span class="pill" id="statsPill" title="Saved on this device">Stats: 0/0</span>
-        <button class="modeBtn" onclick="resetStats()">Reset</button>
-      </div>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="row" style="gap:8px;">
-      <button class="modeBtn" onclick="randomType()">🎲 Random Type</button>
-      <button class="modeBtn" onclick="hideDetail()">🧹 Clear</button>
-    </div>
-
-    <div class="divider"></div>
-
-    <div class="muted mini">
-      Goal: build instant recognition in the wild. Study mode is cue cards. Drill mode forces fast recall with multiple choice and tracking.
-    </div>
+  <div class="topControls">
+    <select id="modeSelect" aria-label="Training mode">
+      <option value="browse">Mode: Browse</option>
+      <option value="quizType">Mode: Quiz (Guess the Type)</option>
+    </select>
+    <button onclick="resetStats()">🧹 Reset Stats</button>
   </div>
 
-  <!-- Study Mode -->
-  <div id="studyWrap">
-    <div class="grid" id="typeGrid"></div>
-    <div class="card" id="detailCard" style="display:none;"></div>
-  </div>
+  <div class="grid" id="typeGrid"></div>
 
-  <!-- Drill Mode -->
-  <div id="drillWrap" style="display:none;">
-    <div class="card" id="drillCard">
-      <div class="row" style="justify-content:space-between;">
-        <div>
-          <div class="muted">Prompt</div>
-          <div class="big" id="drillPromptTitle">Loading…</div>
-          <div class="muted" id="drillPromptBody"></div>
-        </div>
-        <div class="pill" id="drillMeta">Round</div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="muted">Pick the type</div>
-      <div class="grid" id="drillOptions"></div>
-
-      <div class="divider"></div>
-
-      <div class="row" style="justify-content:space-between;">
-        <div class="muted" id="drillFeedback"> </div>
-        <div class="row">
-          <button class="modeBtn" id="btnNext" onclick="nextDrill()" disabled>Next</button>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="row" style="justify-content:space-between;">
-        <div class="muted mini" id="drillStatsLine">Streak: 0 | Best: 0</div>
-        <button class="modeBtn" onclick="revealAnswer()">Reveal</button>
-      </div>
-    </div>
-  </div>
+  <div class="card" id="detailCard" style="display:none;"></div>
 </main>
 
 <script>
@@ -149,188 +72,33 @@
   }
 
   const statusEl = document.getElementById("status");
-  const statsPillEl = document.getElementById("statsPill");
-
   const gridEl = document.getElementById("typeGrid");
   const detailEl = document.getElementById("detailCard");
-
-  const studyWrap = document.getElementById("studyWrap");
-  const drillWrap = document.getElementById("drillWrap");
-  const btnStudy = document.getElementById("btnStudy");
-  const btnDrill = document.getElementById("btnDrill");
-
-  const drillPromptTitle = document.getElementById("drillPromptTitle");
-  const drillPromptBody  = document.getElementById("drillPromptBody");
-  const drillMeta        = document.getElementById("drillMeta");
-  const drillOptions     = document.getElementById("drillOptions");
-  const drillFeedback    = document.getElementById("drillFeedback");
-  const drillStatsLine   = document.getElementById("drillStatsLine");
-  const btnNext          = document.getElementById("btnNext");
+  const modeSelect = document.getElementById("modeSelect");
 
   let LIB = null;
-  let MODE = "study";
 
-  // Drill state
-  let currentDrill = null; // { answerType, options[], locked }
-  let round = 0;
+  // --- MBTI expansions (for repetition training) ---
+  const LETTER = {
+    I: "Introverted",
+    E: "Extraverted",
+    N: "Intuitive",
+    S: "Sensing",
+    T: "Thinking",
+    F: "Feeling",
+    J: "Judging",
+    P: "Perceiving"
+  };
 
-  const STORE_KEY = "mbti_field_trainer_stats_v1";
-  let STATS = loadStats();
+  function expandType(code){
+    if(!code || code.length !== 4) return "";
+    const parts = code.split("").map(ch => LETTER[ch] || ch);
+    return `${code} (${parts.join(", ")})`;
+  }
 
   function setStatus(txt){ statusEl.textContent = txt; }
 
   function escapeHtml(s){
     return String(s)
       .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
-
-  function typeExpanded(code){
-    // E/I, S/N, T/F, J/P
-    const map = {
-      E: "Extraverted",
-      I: "Introverted",
-      S: "Sensing",
-      N: "Intuitive",
-      T: "Thinking",
-      F: "Feeling",
-      J: "Judging",
-      P: "Perceiving"
-    };
-    const letters = code.split("");
-    return letters.map(ch => map[ch] || ch).join(" • ");
-  }
-
-  function shortExpanded(code){
-    // INTJ (Introverted • Intuitive • Thinking • Judging)
-    return `${code} (${typeExpanded(code)})`;
-  }
-
-  function renderGrid(types){
-    gridEl.innerHTML = types.map(t => `
-      <button onclick="showType('${t.type}')">
-        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;">
-          <div>
-            <div style="font-weight:900;font-size:16px;">${t.type}</div>
-            <div class="muted mini">${escapeHtml(typeExpanded(t.type))}</div>
-            <div class="muted" style="font-size:12px;margin-top:4px;">${escapeHtml(t.callSign)}</div>
-          </div>
-          <div class="pill">${escapeHtml(t.essence)}</div>
-        </div>
-      </button>
-    `).join("");
-  }
-
-  function showType(code){
-    const t = LIB.types.find(x => x.type === code);
-    if(!t) return;
-
-    detailEl.style.display = "block";
-    detailEl.innerHTML = `
-      <div class="row" style="justify-content:space-between;align-items:flex-start;">
-        <div>
-          <div class="big">${t.type} <span class="muted">•</span> <span class="accent">${escapeHtml(t.callSign)}</span></div>
-          <div class="muted mini">${escapeHtml(typeExpanded(t.type))}</div>
-          <div class="muted" style="margin-top:6px;">${escapeHtml(t.essence)}</div>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div class="muted">Observable tells</div>
-      <ul>${t.observableTells.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>
-
-      <div class="divider"></div>
-
-      <div class="muted">Earns trust</div>
-      <ul>${t.trustSignals.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>
-
-      <div class="divider"></div>
-
-      <div class="muted">Annoys them</div>
-      <ul>${t.annoysThem.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>
-
-      <div class="divider"></div>
-
-      <div class="muted">Pitch style</div>
-      <div>${escapeHtml(t.pitchStyle)}</div>
-
-      <div class="divider"></div>
-
-      <div class="muted">Verify questions</div>
-      <ul>${t.verifyQuestions.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>
-
-      <div class="divider"></div>
-
-      <div class="muted">Mistype traps</div>
-      <div>${t.mistypeTraps.map(x=>`<span class="pill" style="margin-right:6px;margin-bottom:6px;display:inline-block;">${escapeHtml(x)}</span>`).join("")}</div>
-
-      <div class="divider"></div>
-
-      <div class="muted">Stress notes</div>
-      <div>${escapeHtml(t.stressNotes)}</div>
-    `;
-    detailEl.scrollIntoView({behavior:"smooth", block:"start"});
-  }
-
-  function hideDetail(){
-    detailEl.style.display = "none";
-    detailEl.innerHTML = "";
-  }
-
-  function randomType(){
-    if(!LIB) return;
-    const idx = Math.floor(Math.random() * LIB.types.length);
-    showType(LIB.types[idx].type);
-  }
-
-  // ----------------------------
-  // Mode control
-  // ----------------------------
-  function setMode(mode){
-    MODE = mode;
-
-    if(mode === "study"){
-      studyWrap.style.display = "block";
-      drillWrap.style.display = "none";
-      btnStudy.classList.add("active");
-      btnDrill.classList.remove("active");
-    } else {
-      studyWrap.style.display = "none";
-      drillWrap.style.display = "block";
-      btnStudy.classList.remove("active");
-      btnDrill.classList.add("active");
-      nextDrill(true);
-    }
-  }
-
-  // ----------------------------
-  // Stats
-  // ----------------------------
-  function loadStats(){
-    try{
-      const raw = localStorage.getItem(STORE_KEY);
-      if(!raw) return { attempts:0, correct:0, streak:0, bestStreak:0 };
-      const s = JSON.parse(raw);
-      return {
-        attempts: Number(s.attempts||0),
-        correct: Number(s.correct||0),
-        streak: Number(s.streak||0),
-        bestStreak: Number(s.bestStreak||0),
-      };
-    } catch(e){
-      return { attempts:0, correct:0, streak:0, bestStreak:0 };
-    }
-  }
-
-  function saveStats(){
-    localStorage.setItem(STORE_KEY, JSON.stringify(STATS));
-    updateStatsUI();
-  }
-
-  function updateStatsUI(){
-    statsPillEl.textContent = `Stats: ${STATS.correct}/${STATS.attempts}`;
-    drillStatsLine.textContent = `Streak: ${STATS.streak} | Best: ${STATS.b
+      .re
