@@ -1,0 +1,456 @@
+{
+  "version": "1.0",
+  "types": [
+    {
+      "type": "INTJ",
+      "callSign": "Strategic Architect",
+      "essence": "Builds systems that win long-term.",
+      "observableTells": [
+        "compresses thoughts, speaks in conclusions",
+        "thinks in outcomes, efficiencies, strategy",
+        "prefers autonomy over collaboration"
+      ],
+      "trustSignals": [
+        "competence, clarity, directness",
+        "you respect their time",
+        "you bring a real plan"
+      ],
+      "annoysThem": [
+        "vague goals",
+        "inefficient meetings",
+        "emotional pressure to conform"
+      ],
+      "pitchStyle": "Lead with the goal, constraints, and a strategy. Offer options, then recommend one.",
+      "verifyQuestions": [
+        "Do you prefer a clean plan up front, or figure it out as you go?",
+        "Would you rather be effective or liked, if you had to choose?",
+        "When you decide, do you commit fast and move?"
+      ],
+      "mistypeTraps": ["INTP", "ENTJ", "INFJ"],
+      "stressNotes": "Under stress can look like ENTJ: more blunt, more controlling, more impatient."
+    },
+    {
+      "type": "INTP",
+      "callSign": "Conceptual Analyst",
+      "essence": "Explores how reality works, then rebuilds it in their head.",
+      "observableTells": [
+        "curious questioning, playful skepticism",
+        "improvises frameworks on the fly",
+        "delays decisions until the model feels correct"
+      ],
+      "trustSignals": [
+        "intellectual honesty",
+        "freedom to explore without pressure",
+        "clean logic and evidence"
+      ],
+      "annoysThem": [
+        "forced certainty",
+        "authority without reasoning",
+        "being rushed to decide"
+      ],
+      "pitchStyle": "Present a problem and invite them to critique. Let them improve the model.",
+      "verifyQuestions": [
+        "Do you like to decide quickly, or keep thinking until it’s airtight?",
+        "What do you enjoy more: building the plan or understanding the system?",
+        "Do you change your mind when new info hits?"
+      ],
+      "mistypeTraps": ["INTJ", "ENTP", "ISTP"],
+      "stressNotes": "Under stress can look avoidant or withdrawn. Might go silent and disappear into analysis."
+    },
+    {
+      "type": "ENTJ",
+      "callSign": "Command Strategist",
+      "essence": "Organizes people and resources to win.",
+      "observableTells": [
+        "speaks in directives and outcomes",
+        "quick decisions, strong momentum",
+        "comfortable leading or taking charge"
+      ],
+      "trustSignals": [
+        "you execute fast",
+        "you respect authority and results",
+        "you bring solutions, not problems"
+      ],
+      "annoysThem": [
+        "indecision",
+        "inefficiency",
+        "people who stall the mission"
+      ],
+      "pitchStyle": "State the objective, timeline, ROI. Ask for a decision.",
+      "verifyQuestions": [
+        "Do you want to decide now and adjust later?",
+        "When you see chaos, do you step in to organize it?",
+        "What frustrates you more: inefficiency or emotional conflict?"
+      ],
+      "mistypeTraps": ["ESTJ", "INTJ", "ENTP"],
+      "stressNotes": "Under stress can get domineering and impatient. May bulldoze softer stakeholders."
+    },
+    {
+      "type": "ENTP",
+      "callSign": "Provocateur Inventor",
+      "essence": "Generates options, breaks assumptions, keeps it moving.",
+      "observableTells": [
+        "rapid idea switching",
+        "debates for sport",
+        "hates feeling trapped or controlled"
+      ],
+      "trustSignals": [
+        "you can spar without getting offended",
+        "you allow experimentation",
+        "you stay mentally agile"
+      ],
+      "annoysThem": [
+        "rigid rules",
+        "slow processes",
+        "fragile egos"
+      ],
+      "pitchStyle": "Make it interesting. Give them space to remix it and add leverage.",
+      "verifyQuestions": [
+        "Do you enjoy debating ideas even if you agree?",
+        "What drains you more: rigid structure or emotional sensitivity?",
+        "Do you like freedom more than certainty?"
+      ],
+      "mistypeTraps": ["ENFP", "INTP", "ESTP"],
+      "stressNotes": "Under stress can turn contrarian, argumentative, or reckless with decisions."
+    },
+
+    {
+      "type": "INFJ",
+      "callSign": "Mission Seer",
+      "essence": "Finds meaning, then builds a path to it.",
+      "observableTells": [
+        "quiet intensity, strong internal direction",
+        "reads people fast",
+        "talks about themes, purpose, alignment"
+      ],
+      "trustSignals": [
+        "respect for values and intention",
+        "you’re sincere, not performative",
+        "you don’t intrude emotionally too fast"
+      ],
+      "annoysThem": [
+        "shallow behavior",
+        "manipulation",
+        "meaningless work"
+      ],
+      "pitchStyle": "Frame the WHY, then the plan. Show integrity and outcomes.",
+      "verifyQuestions": [
+        "Do you care more about meaning or results, if it’s a tradeoff?",
+        "Do you usually know where something is going before others do?",
+        "Do you prefer a focused vision over endless options?"
+      ],
+      "mistypeTraps": ["INFP", "INTJ", "ENFJ"],
+      "stressNotes": "Under stress can become critical, withdrawn, and privately resentful. May ‘door slam’."
+    },
+    {
+      "type": "INFP",
+      "callSign": "Values Guardian",
+      "essence": "Protects authenticity and inner truth.",
+      "observableTells": [
+        "soft spoken but stubborn inside",
+        "deep personal values",
+        "idealistic about people or the world"
+      ],
+      "trustSignals": [
+        "gentle respect",
+        "no coercion",
+        "you honor their autonomy and ethics"
+      ],
+      "annoysThem": [
+        "being rushed",
+        "coldness",
+        "performative values"
+      ],
+      "pitchStyle": "Lead with values, fairness, impact. Keep it human.",
+      "verifyQuestions": [
+        "Do you choose based on what feels right internally?",
+        "Do you need time to feel aligned before committing?",
+        "What bothers you more: being unfair or being ineffective?"
+      ],
+      "mistypeTraps": ["INFJ", "ISFP", "ENFP"],
+      "stressNotes": "Under stress can look like INFJ: more intense, more critical, more withdrawn."
+    },
+    {
+      "type": "ENFJ",
+      "callSign": "Social Architect",
+      "essence": "Aligns people around a shared mission.",
+      "observableTells": [
+        "motivates and guides others",
+        "reads group dynamics quickly",
+        "values harmony, but still mission-driven"
+      ],
+      "trustSignals": [
+        "respect for people",
+        "shared values",
+        "you help them help others"
+      ],
+      "annoysThem": [
+        "social insensitivity",
+        "unnecessary conflict",
+        "people who sabotage the group"
+      ],
+      "pitchStyle": "Connect the idea to people, values, and team momentum.",
+      "verifyQuestions": [
+        "Do you naturally take responsibility for the group vibe?",
+        "Do you notice what people need before they say it?",
+        "Do you feel driven to improve others?"
+      ],
+      "mistypeTraps": ["INFJ", "ESFJ", "ENTJ"],
+      "stressNotes": "Under stress can become controlling, over-responsible, or emotionally exhausted."
+    },
+    {
+      "type": "ENFP",
+      "callSign": "Possibility Catalyst",
+      "essence": "Creates momentum through imagination and connection.",
+      "observableTells": [
+        "high enthusiasm and verbal energy",
+        "connects ideas to people and stories",
+        "hates feeling boxed in"
+      ],
+      "trustSignals": [
+        "freedom to create",
+        "warmth and openness",
+        "room to explore possibilities"
+      ],
+      "annoysThem": [
+        "rigid micromanagement",
+        "cold transactional talk",
+        "being trapped in routine"
+      ],
+      "pitchStyle": "Show exciting options, then anchor one path gently.",
+      "verifyQuestions": [
+        "Do you get energy from possibilities more than details?",
+        "Do you decide by excitement or by certainty?",
+        "Do you feel restricted by strict plans?"
+      ],
+      "mistypeTraps": ["ENTP", "INFP", "ESFP"],
+      "stressNotes": "Under stress can look like INFJ: more serious, more narrow, more future-anxious."
+    },
+
+    {
+      "type": "ISTJ",
+      "callSign": "Reliable Executor",
+      "essence": "Keeps the system stable and correct.",
+      "observableTells": [
+        "precise, careful, duty-driven",
+        "prefers proven processes",
+        "low tolerance for chaos"
+      ],
+      "trustSignals": [
+        "consistency",
+        "clear expectations",
+        "respect for standards"
+      ],
+      "annoysThem": [
+        "sloppiness",
+        "last-minute changes",
+        "rule breaking without reason"
+      ],
+      "pitchStyle": "Explain the process, risks, and why this is the correct method.",
+      "verifyQuestions": [
+        "Do you prefer proven methods or experimentation?",
+        "Do you feel calmer when plans are clear?",
+        "Do last-minute changes frustrate you?"
+      ],
+      "mistypeTraps": ["ESTJ", "ISFJ", "INTJ"],
+      "stressNotes": "Under stress may become rigid, judgmental, or overly rule-bound."
+    },
+    {
+      "type": "ISFJ",
+      "callSign": "Protective Supporter",
+      "essence": "Maintains stability through care and detail.",
+      "observableTells": [
+        "warm, quiet, attentive to needs",
+        "remembers specifics about people",
+        "prefers clear roles and reliability"
+      ],
+      "trustSignals": [
+        "gratitude and respect",
+        "predictability",
+        "you don’t create unnecessary disruption"
+      ],
+      "annoysThem": [
+        "chaos",
+        "disrespect",
+        "people taking advantage"
+      ],
+      "pitchStyle": "Frame it as helpful, stable, and considerate to others.",
+      "verifyQuestions": [
+        "Do you show care through practical help?",
+        "Do you dislike conflict but handle it when needed?",
+        "Do you remember details about people easily?"
+      ],
+      "mistypeTraps": ["ESFJ", "ISTJ", "INFP"],
+      "stressNotes": "Under stress can become anxious, overgiving, or quietly resentful."
+    },
+    {
+      "type": "ESTJ",
+      "callSign": "Operations Driver",
+      "essence": "Turns goals into execution and standards.",
+      "observableTells": [
+        "direct, structured, task-first",
+        "comfortable enforcing standards",
+        "moves fast to decision and action"
+      ],
+      "trustSignals": [
+        "competence",
+        "clear accountability",
+        "follow-through"
+      ],
+      "annoysThem": [
+        "excuses",
+        "inefficiency",
+        "people who stall progress"
+      ],
+      "pitchStyle": "Define roles, timeline, measurable outcomes. Keep it practical.",
+      "verifyQuestions": [
+        "Do you value structure and clear standards?",
+        "Do you take charge when things get messy?",
+        "Do you prefer direct truth over gentle delivery?"
+      ],
+      "mistypeTraps": ["ENTJ", "ISTJ", "ESFJ"],
+      "stressNotes": "Under stress can become harsh, controlling, and intolerant of ambiguity."
+    },
+    {
+      "type": "ESFJ",
+      "callSign": "Community Builder",
+      "essence": "Creates stability through social cohesion.",
+      "observableTells": [
+        "socially attentive and engaged",
+        "organizes people and events naturally",
+        "values harmony and belonging"
+      ],
+      "trustSignals": [
+        "warmth",
+        "respect for group norms",
+        "shared responsibility"
+      ],
+      "annoysThem": [
+        "social coldness",
+        "people who disrupt the group",
+        "lack of appreciation"
+      ],
+      "pitchStyle": "Show how it benefits people, culture, and stability.",
+      "verifyQuestions": [
+        "Do you feel responsible for keeping things smooth socially?",
+        "Do you enjoy organizing people into a working rhythm?",
+        "Do you get stressed when the group is unstable?"
+      ],
+      "mistypeTraps": ["ISFJ", "ENFJ", "ESTJ"],
+      "stressNotes": "Under stress can become approval-seeking, anxious, or controlling via guilt."
+    },
+
+    {
+      "type": "ISTP",
+      "callSign": "Calm Fixer",
+      "essence": "Solves problems through direct action and logic.",
+      "observableTells": [
+        "chill under pressure",
+        "hands-on troubleshooting",
+        "brief communication, practical focus"
+      ],
+      "trustSignals": [
+        "space",
+        "clear problems to solve",
+        "no emotional manipulation"
+      ],
+      "annoysThem": [
+        "overdramatic reactions",
+        "excessive rules",
+        "talking without action"
+      ],
+      "pitchStyle": "Give the problem, give constraints, let them work.",
+      "verifyQuestions": [
+        "Do you prefer to learn by doing?",
+        "Do emotions in meetings drain you?",
+        "Do you stay calm when things break?"
+      ],
+      "mistypeTraps": ["INTP", "ESTP", "ISFP"],
+      "stressNotes": "Under stress may detach hard and disappear. Can become blunt or reckless."
+    },
+    {
+      "type": "ESTP",
+      "callSign": "Momentum Operator",
+      "essence": "Acts fast, learns fast, moves the room.",
+      "observableTells": [
+        "direct and bold",
+        "action-first, results-now",
+        "thrives in chaos and real-world challenges"
+      ],
+      "trustSignals": [
+        "confidence",
+        "competence under pressure",
+        "you keep it real"
+      ],
+      "annoysThem": [
+        "slow planning",
+        "fragility",
+        "overthinking"
+      ],
+      "pitchStyle": "Make it concrete, immediate, and practical. Show the payoff.",
+      "verifyQuestions": [
+        "Would you rather try it and adjust, or plan it perfectly first?",
+        "Do you get bored in long theoretical discussions?",
+        "Do you enjoy high pressure situations?"
+      ],
+      "mistypeTraps": ["ENTP", "ISTP", "ESFP"],
+      "stressNotes": "Under stress can become reckless or confrontational, or double down on control."
+    },
+    {
+      "type": "ISFP",
+      "callSign": "Quiet Aesthetic",
+      "essence": "Moves through life by taste, feeling, and authenticity.",
+      "observableTells": [
+        "gentle presence, understated creativity",
+        "values personal freedom",
+        "present-focused, experience-driven"
+      ],
+      "trustSignals": [
+        "nonjudgmental respect",
+        "space to be themselves",
+        "gentle clarity"
+      ],
+      "annoysThem": [
+        "harsh criticism",
+        "being controlled",
+        "performative people"
+      ],
+      "pitchStyle": "Keep it simple, human, and respectful. Let them choose.",
+      "verifyQuestions": [
+        "Do you know what you like instantly, even if you can’t explain it?",
+        "Do you dislike being boxed in by strict systems?",
+        "Do you prefer experiences over theory?"
+      ],
+      "mistypeTraps": ["INFP", "ISTP", "ESFP"],
+      "stressNotes": "Under stress may shut down emotionally or withdraw. Can become unexpectedly stubborn."
+    },
+    {
+      "type": "ESFP",
+      "callSign": "Vibe Igniter",
+      "essence": "Creates energy through presence and experience.",
+      "observableTells": [
+        "expressive, social, playful",
+        "lives in the moment",
+        "high awareness of atmosphere"
+      ],
+      "trustSignals": [
+        "fun and authenticity",
+        "warmth",
+        "shared experiences"
+      ],
+      "annoysThem": [
+        "coldness",
+        "over-structure",
+        "being judged"
+      ],
+      "pitchStyle": "Make it tangible, enjoyable, and socially relevant.",
+      "verifyQuestions": [
+        "Do you prefer doing it now rather than planning it?",
+        "Do you read the vibe of a room instantly?",
+        "Do you get energy from people fast?"
+      ],
+      "mistypeTraps": ["ENFP", "ESTP", "ISFP"],
+      "stressNotes": "Under stress may avoid reality, seek distraction, or get dramatic."
+    }
+  ]
+}
