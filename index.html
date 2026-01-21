@@ -6,99 +6,402 @@
   <title>MBTI Field Trainer</title>
   <link rel="manifest" href="manifest.json">
   <style>
-    :root {
+    :root{
       --bg:#0b0f14; --card:#121a24; --border:#223043;
       --text:#e8f0fb; --muted:#8aa0b6; --accent:#5bbcff;
-      --good:#29d17d; --bad:#ff5b5b;
+      --bad:#ff5b5b; --good:#40d887;
     }
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);}
     header{position:sticky;top:0;background:rgba(11,15,20,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:14px 16px;}
-    h1{margin:0;font-size:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;}
+    h1{margin:0;font-size:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
     main{padding:16px;max-width:900px;margin:0 auto;}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:12px;}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:12px;}
     .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;}
     .muted{color:var(--muted);}
     .big{font-size:20px;font-weight:800;}
+    .pill{font-size:12px;color:var(--muted);border:1px solid var(--border);padding:4px 10px;border-radius:999px;}
+    .divider{height:1px;background:var(--border);margin:12px 0;}
+    .accent{color:var(--accent);}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+    select{
+      border:1px solid var(--border);background:#0f1620;color:var(--text);
+      padding:10px 12px;border-radius:12px;font-weight:700;
+    }
     button{
       width:100%;text-align:left;
       border:1px solid var(--border);background:#0f1620;color:var(--text);
       padding:12px 14px;border-radius:12px;font-weight:700;cursor:pointer;
     }
     button:hover{border-color:#2c3f57;}
-    .pill{font-size:12px;color:var(--muted);border:1px solid var(--border);padding:4px 10px;border-radius:999px;}
+    .btnRow{display:flex;gap:10px;flex-wrap:wrap;}
+    .btnRow button{width:auto;}
+    .good{color:var(--good);}
+    .bad{color:var(--bad);}
     ul{margin:8px 0 0 18px;}
-    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
-    .row button{width:auto;}
-    .divider{height:1px;background:var(--border);margin:12px 0;}
-    .accent{color:var(--accent);}
-    .topControls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
-    .topControls > *{flex:1;}
-    select{
-      width:100%;
-      border:1px solid var(--border);
-      background:#0f1620;color:var(--text);
-      padding:12px 14px;border-radius:12px;font-weight:700;
-    }
-    .resultGood{color:var(--good);font-weight:800;}
-    .resultBad{color:var(--bad);font-weight:800;}
-    .small{font-size:12px;}
+    .choiceBtn{display:block;width:100%;margin-top:8px;}
+    .center{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
   </style>
 </head>
+
 <body>
 <header>
   <h1>
     <span>MBTI Field Trainer</span>
-    <span class="pill" id="status">Loading…</span>
+
+    <span class="row">
+      <span class="pill" id="status">Loading…</span>
+      <select id="modeSelect" aria-label="Training mode">
+        <option value="browse">Mode: Browse</option>
+        <option value="quizType">Mode: Quiz (Guess the Type)</option>
+      </select>
+      <button id="resetBtn" style="width:auto;">🧹 Reset Stats</button>
+    </span>
   </h1>
 </header>
 
 <main>
-  <div class="topControls">
-    <select id="modeSelect" aria-label="Training mode">
-      <option value="browse">Mode: Browse</option>
-      <option value="quizType">Mode: Quiz (Guess the Type)</option>
-    </select>
-    <button onclick="resetStats()">🧹 Reset Stats</button>
-  </div>
-
-  <div class="grid" id="typeGrid"></div>
-
-  <div class="card" id="detailCard" style="display:none;"></div>
+  <div id="app"></div>
 </main>
 
 <script>
+  // Optional PWA support (can cause caching confusion while building)
+  // If you want zero caching problems while iterating, comment this out.
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js").catch(()=>{});
   }
 
   const statusEl = document.getElementById("status");
-  const gridEl = document.getElementById("typeGrid");
-  const detailEl = document.getElementById("detailCard");
   const modeSelect = document.getElementById("modeSelect");
+  const resetBtn = document.getElementById("resetBtn");
+  const appEl = document.getElementById("app");
 
   let LIB = null;
+  let mode = "browse";
 
-  // --- MBTI expansions (for repetition training) ---
-  const LETTER = {
-    I: "Introverted",
-    E: "Extraverted",
-    N: "Intuitive",
-    S: "Sensing",
-    T: "Thinking",
-    F: "Feeling",
-    J: "Judging",
-    P: "Perceiving"
-  };
-
-  function expandType(code){
-    if(!code || code.length !== 4) return "";
-    const parts = code.split("").map(ch => LETTER[ch] || ch);
-    return `${code} (${parts.join(", ")})`;
-  }
+  const STATS_KEY = "mbti_ft_stats_v1";
+  const statsDefault = { attempts: 0, correct: 0, streak: 0, bestStreak: 0 };
 
   function setStatus(txt){ statusEl.textContent = txt; }
+
+  function loadStats(){
+    try{
+      const raw = localStorage.getItem(STATS_KEY);
+      return raw ? JSON.parse(raw) : {...statsDefault};
+    }catch{
+      return {...statsDefault};
+    }
+  }
+
+  function saveStats(s){
+    localStorage.setItem(STATS_KEY, JSON.stringify(s));
+  }
+
+  function resetStats(){
+    saveStats({...statsDefault});
+    render();
+  }
 
   function escapeHtml(s){
     return String(s)
       .replaceAll("&","&amp;")
-      .re
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function letterName(ch){
+    const map = {
+      I:"Introverted", E:"Extraverted",
+      S:"Sensing", N:"Intuitive",
+      T:"Thinking", F:"Feeling",
+      J:"Judging", P:"Perceiving"
+    };
+    return map[ch] || ch;
+  }
+
+  function expandedTypeLabel(code){
+    const parts = code.split("").map(letterName);
+    return `${code} (${parts.join(", ")})`;
+  }
+
+  function pickRandom(arr){
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function pickDistractors(correctType, count=3){
+    const pool = LIB.types.filter(t => t.type !== correctType);
+    const picks = [];
+    while(picks.length < count && pool.length){
+      const p = pickRandom(pool);
+      if(!picks.find(x => x.type === p.type)) picks.push(p);
+    }
+    return picks;
+  }
+
+  // ---------- Browse Mode ----------
+  function renderBrowse(){
+    const types = LIB.types;
+
+    appEl.innerHTML = `
+      <div class="card">
+        <div class="center">
+          <div>
+            <div class="big">Browse Cards</div>
+            <div class="muted">Tap a type to open its cue card.</div>
+          </div>
+          <div class="btnRow">
+            <button onclick="randomBrowse()">🎲 Random</button>
+            <button onclick="hideDetail()">📚 Hide Card</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid" id="typeGrid"></div>
+      <div class="card" id="detailCard" style="display:none;"></div>
+    `;
+
+    const gridEl = document.getElementById("typeGrid");
+    gridEl.innerHTML = types.map(t => `
+      <button onclick="showType('${t.type}')">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;">
+          <div>
+            <div style="font-weight:900;font-size:16px;">${escapeHtml(t.type)}</div>
+            <div class="muted" style="font-size:12px;">${escapeHtml(t.callSign)}</div>
+            <div class="muted" style="font-size:12px;margin-top:4px;">${escapeHtml(expandedTypeLabel(t.type))}</div>
+          </div>
+          <div class="pill">${escapeHtml(t.essence)}</div>
+        </div>
+      </button>
+    `).join("");
+  }
+
+  window.showType = function(code){
+    const t = LIB.types.find(x => x.type === code);
+    if(!t) return;
+
+    const detailEl = document.getElementById("detailCard");
+    detailEl.style.display = "block";
+    detailEl.innerHTML = `
+      <div>
+        <div class="big">${escapeHtml(t.type)} <span class="muted">•</span> <span class="accent">${escapeHtml(t.callSign)}</span></div>
+        <div class="muted" style="margin-top:6px;">${escapeHtml(expandedTypeLabel(t.type))}</div>
+        <div class="muted" style="margin-top:6px;">${escapeHtml(t.essence)}</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="muted">Observable tells</div>
+      <ul>${t.observableTells.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>
+
+      <div class="divider"></div>
+
+      <div class="muted">Earns trust</div>
+      <ul>${t.trustSignals.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>
+
+      <div class="divider"></div>
+
+      <div class="muted">Annoys them</div>
+      <ul>${t.annoysThem.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>
+
+      <div class="divider"></div>
+
+      <div class="muted">Pitch style</div>
+      <div>${escapeHtml(t.pitchStyle)}</div>
+
+      <div class="divider"></div>
+
+      <div class="muted">Verify questions</div>
+      <ul>${t.verifyQuestions.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>
+
+      <div class="divider"></div>
+
+      <div class="muted">Mistype traps</div>
+      <div>${t.mistypeTraps.map(x=>`<span class="pill" style="margin-right:6px;">${escapeHtml(x)}</span>`).join("")}</div>
+
+      <div class="divider"></div>
+
+      <div class="muted">Stress notes</div>
+      <div>${escapeHtml(t.stressNotes)}</div>
+    `;
+    detailEl.scrollIntoView({behavior:"smooth", block:"start"});
+  }
+
+  window.hideDetail = function(){
+    const detailEl = document.getElementById("detailCard");
+    if(!detailEl) return;
+    detailEl.style.display = "none";
+    detailEl.innerHTML = "";
+  }
+
+  window.randomBrowse = function(){
+    const t = pickRandom(LIB.types);
+    showType(t.type);
+  }
+
+  // ---------- Quiz Mode ----------
+  function renderQuiz(){
+    const stats = loadStats();
+    const accuracy = stats.attempts ? Math.round((stats.correct / stats.attempts) * 100) : 0;
+
+    // Pick a prompt type
+    const target = pickRandom(LIB.types);
+    const distractors = pickDistractors(target.type, 3);
+    const choices = [target, ...distractors].sort(()=>Math.random()-0.5);
+
+    // Prompt content: short + practical
+    const promptTells = target.observableTells.slice(0, 3);
+    const promptQs = target.verifyQuestions.slice(0, 1);
+
+    appEl.innerHTML = `
+      <div class="card">
+        <div class="center">
+          <div>
+            <div class="big">Quiz: Guess the Type</div>
+            <div class="muted">Read the tells and pick the most likely type.</div>
+          </div>
+          <div>
+            <div class="pill">Attempts: ${stats.attempts}</div>
+            <div class="pill" style="margin-top:6px;">Correct: ${stats.correct} (${accuracy}%)</div>
+            <div class="pill" style="margin-top:6px;">Streak: ${stats.streak} (Best ${stats.bestStreak})</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="quizCard">
+        <div class="muted">Prompt</div>
+        <div style="margin-top:8px;font-weight:800;">${escapeHtml(target.callSign)}</div>
+        <div class="muted" style="margin-top:6px;">${escapeHtml(target.essence)}</div>
+
+        <div class="divider"></div>
+
+        <div class="muted">Observable tells (3)</div>
+        <ul>${promptTells.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>
+
+        <div class="divider"></div>
+
+        <div class="muted">Verify question</div>
+        <div>${escapeHtml(promptQs[0] || "What do you value most in a working relationship?")}</div>
+
+        <div class="divider"></div>
+
+        <div class="muted">Choose the type</div>
+        <div id="choices"></div>
+
+        <div class="divider"></div>
+
+        <div id="feedback" class="muted"> </div>
+
+        <div class="btnRow" style="margin-top:10px;">
+          <button onclick="nextQuiz()">➡️ Next</button>
+          <button onclick="revealAnswer('${target.type}')">👀 Reveal</button>
+        </div>
+      </div>
+    `;
+
+    const choicesEl = document.getElementById("choices");
+    choicesEl.innerHTML = choices.map(c => `
+      <button class="choiceBtn" onclick="answerQuiz('${target.type}','${c.type}')">
+        ${escapeHtml(expandedTypeLabel(c.type))}
+      </button>
+    `).join("");
+  }
+
+  window.answerQuiz = function(correctType, pickedType){
+    const stats = loadStats();
+    stats.attempts += 1;
+
+    const ok = (correctType === pickedType);
+    if(ok){
+      stats.correct += 1;
+      stats.streak += 1;
+      stats.bestStreak = Math.max(stats.bestStreak, stats.streak);
+    }else{
+      stats.streak = 0;
+    }
+    saveStats(stats);
+
+    const feedbackEl = document.getElementById("feedback");
+    if(!feedbackEl) return;
+
+    if(ok){
+      feedbackEl.innerHTML = `<span class="good">Correct ✅</span> You picked <b>${escapeHtml(expandedTypeLabel(pickedType))}</b>.`;
+    }else{
+      feedbackEl.innerHTML = `<span class="bad">Not quite ❌</span> Correct was <b>${escapeHtml(expandedTypeLabel(correctType))}</b>. You chose <b>${escapeHtml(expandedTypeLabel(pickedType))}</b>.`;
+    }
+
+    // Disable buttons after answer
+    document.querySelectorAll(".choiceBtn").forEach(btn => {
+      btn.disabled = true;
+      btn.style.opacity = "0.75";
+      btn.style.cursor = "default";
+    });
+
+    setStatus("Ready ✅");
+    // Re-render stats area by re-rendering whole quiz after answering is optional,
+    // but we keep it stable so the user can review.
+  }
+
+  window.revealAnswer = function(correctType){
+    const feedbackEl = document.getElementById("feedback");
+    if(!feedbackEl) return;
+    feedbackEl.innerHTML = `Answer: <b>${escapeHtml(expandedTypeLabel(correctType))}</b>`;
+  }
+
+  window.nextQuiz = function(){
+    render(); // re-pick new target
+  }
+
+  // ---------- App Shell ----------
+  function render(){
+    if(!LIB || !LIB.types || !LIB.types.length){
+      appEl.innerHTML = `<div class="card">No data loaded. Check types.json.</div>`;
+      return;
+    }
+
+    if(mode === "quizType"){
+      renderQuiz();
+    }else{
+      renderBrowse();
+    }
+  }
+
+  modeSelect.addEventListener("change", (e)=>{
+    mode = e.target.value;
+    render();
+  });
+
+  resetBtn.addEventListener("click", ()=>{
+    resetStats();
+  });
+
+  async function init(){
+    try{
+      const res = await fetch("./types.json", {cache:"no-store"});
+      if(!res.ok) throw new Error("types.json fetch failed: " + res.status);
+      LIB = await res.json();
+
+      setStatus("Ready ✅");
+      render();
+    } catch(e){
+      console.error(e);
+      setStatus("Load failed");
+      appEl.innerHTML = `
+        <div class="card">
+          <div class="big">Could not load types.json</div>
+          <div class="muted" style="margin-top:8px;">
+            Make sure <b>types.json</b> exists in the repo root next to index.html.
+          </div>
+          <div class="muted" style="margin-top:8px;">
+            Tip: open <code>/types.json</code> directly to confirm it loads.
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  init();
+</script>
+
+</body>
+</html>
